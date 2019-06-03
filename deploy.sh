@@ -68,7 +68,7 @@ fi
 # Deployment
 # ----------
 
-echo Handling react app deployment.
+echo Handling Angular app deployment.
 
 # 1. Install npm packages
 if [ -e "$DEPLOYMENT_SOURCE/package.json" ]; then
