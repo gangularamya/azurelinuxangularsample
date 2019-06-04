@@ -70,16 +70,31 @@ fi
 
 echo Handling Angular app deployment.
 
-# 1. Install npm packages
+
+# 1. Select node version
+selectNodeVersion
+
+# 2. Install NPM packages
 if [ -e "$DEPLOYMENT_SOURCE/package.json" ]; then
+  echo "test message 9999"
   cd "$DEPLOYMENT_SOURCE"
-  echo "Running npm install"
-  eval npm install
+  echo "test message 9998 $DEPLOYMENT_SOURCE"
+  eval /opt/nodejs/10.1.0/bin/npm install --production
+  echo "test message 9997 $DEPLOYMENT_SOURCE"
+  eval /opt/nodejs/10.1.0/bin/npm install --only=dev
+  echo "test message 9996 $DEPLOYMENT_SOURCE"
   exitWithMessageOnError "npm failed"
-  echo "Building Angular app"
-  eval ./node_modules/.bin/ng build --prod
+  cd - > /dev/null
+fi
+
+# 3. Angular Prod Build
+if [ -e "$DEPLOYMENT_SOURCE/angular.json" ]; then
+  cd "$DEPLOYMENT_SOURCE"
+  pwd
+  #eval /opt/nodejs/8.11.2/bin/node /home/site/wwwroot/node_modules/.bin/ng build
+  eval /opt/nodejs/10.1.0/bin/node node_modules/.bin/ng build --prod
   exitWithMessageOnError "Angular build failed"
- cd - > /dev/null
+  cd - > /dev/null
 fi
 
 # 2. Creating deployment target and using simple express app to hit index.html 
