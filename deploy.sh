@@ -2,7 +2,7 @@
 
 # ----------------------
 # KUDU Deployment Script
-# Version: 0.2.2
+# Version: {Version}
 # ----------------------
 
 # Helpers
@@ -64,47 +64,13 @@ if [[ ! -n "$KUDU_SYNC_CMD" ]]; then
   fi
 fi
 
-# Node Helpers
-# ------------
-
-selectNodeVersion () {
-  if [[ -n "$KUDU_SELECT_NODE_VERSION_CMD" ]]; then
-    SELECT_NODE_VERSION="$KUDU_SELECT_NODE_VERSION_CMD \"$DEPLOYMENT_SOURCE\" \"$DEPLOYMENT_TARGET\" \"$DEPLOYMENT_TEMP\""
-    eval $SELECT_NODE_VERSION
-    exitWithMessageOnError "select node version failed"
-
-    if [[ -e "$DEPLOYMENT_TEMP/__nodeVersion.tmp" ]]; then
-      NODE_EXE=`cat "$DEPLOYMENT_TEMP/__nodeVersion.tmp"`
-      exitWithMessageOnError "getting node version failed"
-    fi
-
-    if [[ -e "$DEPLOYMENT_TEMP/.tmp" ]]; then
-      NPM_JS_PATH=`cat "$DEPLOYMENT_TEMP/__npmVersion.tmp"`
-      exitWithMessageOnError "getting npm version failed"
-    fi
-
-    if [[ ! -n "$NODE_EXE" ]]; then
-      NODE_EXE=node
-    fi
-
-    NPM_CMD="\"$NODE_EXE\" \"$NPM_JS_PATH\""
-  else
-    NPM_CMD=npm
-    NODE_EXE=node
-  fi
-}
-
 ##################################################################################################################################
 # Deployment
 # ----------
 
-echo Handling node.js deployment.
+echo Handling react app deployment.
 
-
-# 1. Select node version
-selectNodeVersion
-
-# 2. Install NPM packages
+# 1. Install NPM packages
 if [ -e "$DEPLOYMENT_SOURCE/package.json" ]; then
   echo "test message 9999"
   cd "$DEPLOYMENT_SOURCE"
@@ -117,7 +83,7 @@ if [ -e "$DEPLOYMENT_SOURCE/package.json" ]; then
   cd - > /dev/null
 fi
 
-# 3. Angular Prod Build
+# 2. Angular Prod Build
 if [ -e "$DEPLOYMENT_SOURCE/angular.json" ]; then
   cd "$DEPLOYMENT_SOURCE"
   echo "test message 9995 $DEPLOYMENT_SOURCE"
@@ -126,7 +92,7 @@ if [ -e "$DEPLOYMENT_SOURCE/angular.json" ]; then
   cd - > /dev/null
 fi
 
-# 2. Creating deployment target and using simple express app to hit index.html 
+# 3. Creating deployment target and using simple express app to hit index.html 
 cd "$DEPLOYMENT_TARGET"
 mkdir drop
 echo "installing express module"
@@ -134,7 +100,7 @@ npm i express
 echo "creating express_static.js"
 wget -q https://gist.githubusercontent.com/gangularamya/de1ce2a5921ad0f2bd2339f6c63d77ef/raw/1601cd2d91bd03b308bfad8f9f9fcc616677bb5f/express_static.js -O /home/site/wwwroot/server.js
 
-# 3. KuduSync
+# 4. KuduSync
 if [[ "$IN_PLACE_DEPLOYMENT" -ne "1" ]]; then
   "$KUDU_SYNC_CMD" -v 50 -f "$DEPLOYMENT_SOURCE/dist" -t "$DEPLOYMENT_TARGET/drop" -n "$NEXT_MANIFEST_PATH" -p "$PREVIOUS_MANIFEST_PATH" -i ".git;.hg;.deployment;deploy.sh"
   exitWithMessageOnError "Kudu Sync failed"
