@@ -120,8 +120,7 @@ fi
 # 3. Angular Prod Build
 if [ -e "$DEPLOYMENT_SOURCE/angular.json" ]; then
   cd "$DEPLOYMENT_SOURCE"
-  pwd
-  #eval /opt/nodejs/8.11.2/bin/node /home/site/wwwroot/node_modules/.bin/ng build
+  echo "test message 9995 $DEPLOYMENT_SOURCE"
   eval /opt/nodejs/10.1.0/bin/node node_modules/.bin/ng build --prod
   exitWithMessageOnError "Angular build failed"
   cd - > /dev/null
